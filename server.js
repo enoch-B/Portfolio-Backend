@@ -20,6 +20,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
 
 app.use(
@@ -29,6 +30,10 @@ app.use(
   })
 );
 
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} ${new Date().toISOString()}`);
+  next();
+})
 
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
