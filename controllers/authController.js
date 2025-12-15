@@ -1,9 +1,10 @@
 import User from "../models/user.js";
 import bcrypt from "bcryptjs";
-import { generateToken, generateRefreshToken } from "../utils/jwt.js";
+import { generateToken, generateRefreshToken, verifyToken } from "../utils/jwt.js";
 
 export const login= async (req, res) =>{
     try{
+
         const {email, password} = req.body;
         if(!email || !password){
             return res.status(400).json({message: "Email and password are required"});
@@ -25,6 +26,7 @@ export const login= async (req, res) =>{
         const refreshToken = generateRefreshToken({_id: user._id, role: user.role, name: user.name});
    
         const {password: _, ...userData} = user.toObject();
+        console.log(userData);
         res.status(200).json({
             success: true,
             message: "Login successful",
