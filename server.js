@@ -7,6 +7,9 @@ import cors from "cors";
 import { swaggerUi, swaggerSpec } from "./config/swagger.js";
 import authRoutes from "./routes/authRoutes.js";
 import { connectDB, disconnectDB } from "./config/db.js";
+import userRoutes from "./routes/userRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
 
 
 
@@ -39,6 +42,9 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/settings", settingsRoutes);
 
 const startServer = async () => {
   try {
