@@ -113,6 +113,9 @@ router.post("/refresh-token", refreshToken);
  *               email:
  *                 type: string
  *                 example: "user@example.com"
+ *               username:
+ *                 type: string
+ *                 example: "henokbirhanu"
  *               password:
  *                 type: string
  *                 example: "Password123!"
