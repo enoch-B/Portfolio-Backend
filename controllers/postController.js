@@ -85,7 +85,7 @@ export const getPostBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
     
-    const post = await Post.findOne({ slug }).populate("author", "name email");
+    const post = await Post.findOne({ slug }).populate("author", "name email profilePicture");
     
     if (!post) {
       return res.status(404).json({
@@ -115,8 +115,12 @@ export const getPostBySlug = async (req, res) => {
 // Create new post
 export const createPost = async (req, res) => {
   try {
+
+    console.log("Received post",req.user.profilePicture)
     const { title, slug, excerpt, content, coverImage, tags, status } = req.body;
     const authorId = req.user.id;
+    const authorName= req.user.name;
+  
 
     if (!title || !content) {
       return res.status(400).json({
@@ -137,6 +141,9 @@ export const createPost = async (req, res) => {
       postSlug = `${postSlug}-${Date.now()}`;
     }
 
+    // Get author info
+    const author = await User.findById(authorId).select("name profilePicture");
+    
     const post = new Post({
       title,
       slug: postSlug,
@@ -146,7 +153,12 @@ export const createPost = async (req, res) => {
       tags: Array.isArray(tags) ? tags : [],
       status: status || "draft",
       author: authorId,
-      publishedAt: status === "published" ? new Date() : null
+      publishedAt: status === "published" ? new Date() : null,
+      authorName: authorName || author?.name || req.user?.name || "Admin",
+      authorPhoto: author?.profilePicture || req.user?.profilePicture || {
+        url: "",
+        publicId: ""
+      }
     });
 
     await post.save();
@@ -158,7 +170,7 @@ export const createPost = async (req, res) => {
       post
     });
   } catch (error) {
-    console.error("Error creating post:", error);
+    console.log("Error creating post:", error);
     res.status(500).json({
       success: false,
       message: "Failed to create post",
