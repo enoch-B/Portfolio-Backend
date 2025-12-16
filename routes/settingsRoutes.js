@@ -5,7 +5,7 @@ import { authenticate, requireAdmin } from "../middleware/auth.js";
 const router = express.Router();
 
 // Public route to get settings
-router.get("/", getSettings);
+router.get("/",authenticate, getSettings);
 
 // Protected routes (require admin)
 router.put("/", authenticate, requireAdmin, updateSettings);
