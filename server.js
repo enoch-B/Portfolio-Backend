@@ -10,6 +10,7 @@ import { connectDB, disconnectDB } from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
+import commentRoutes from "./routes/commentRoutes.js";
 
 
 
@@ -45,6 +46,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/comments", commentRoutes);
 
 const startServer = async () => {
   try {
