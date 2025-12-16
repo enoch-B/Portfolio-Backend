@@ -16,7 +16,8 @@ export const authenticate = async (req, res, next) => {
     
     try {
       const decoded = verifyToken(token);
-      
+
+      console.log(decoded);
       // Find user and attach to request
       const user = await User.findById(decoded._id || decoded.id).select("-password");
       
