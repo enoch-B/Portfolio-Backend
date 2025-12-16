@@ -21,6 +21,7 @@ export const  generateToken = (payload) => {
 
 export const generateRefreshToken = (payload) => {
     try {
+      const secret = JWT_SECRET_FROM_ENV || JWT_SECRET;
       // If payload has _id (Mongoose document), create a clean payload
       if (payload._id) {
         const { _id, role, name, ...rest } = payload;
@@ -31,13 +32,13 @@ export const generateRefreshToken = (payload) => {
             name: name,
             ...rest 
           }, 
-          JWT_SECRET, 
+          secret, 
           { expiresIn: REFRESH_TOKEN_EXPIRES_IN }
         );
       }
       
       // If payload is already in the right format, use it as-is
-      return jwt.sign(payload, JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
+      return jwt.sign(payload, secret, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
     } catch (error) {
       console.error("Error generating refresh token:", error);
       throw new Error("Failed to generate refresh token");
@@ -46,7 +47,8 @@ export const generateRefreshToken = (payload) => {
   
   export const verifyToken = (token) => {
     try {
-      return jwt.verify(token, JWT_SECRET);
+      const secret = JWT_SECRET_FROM_ENV || JWT_SECRET;
+      return jwt.verify(token, secret);
     } catch (error) {
       console.error("Token verification failed:", error);
       throw new Error("Invalid or expired token");
