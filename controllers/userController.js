@@ -149,7 +149,7 @@ export const uploadProfilePictureController = async (req, res) => {
 // Get admin profile
 export const getAdminProfile = async (req, res) => {
   try {
-    console.log("Getting admin profile", req.user);
+    
     const userId = req.user.id;
     
     const user = await User.findById(userId).select("-password");
@@ -162,8 +162,16 @@ export const getAdminProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      user: {
+        _id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        role: user.role
+      },
       name: user.name,
       email: user.email,
+      username: user.username,
       profilePicture: user.profilePicture
     });
   } catch (error) {
