@@ -53,13 +53,22 @@ const postSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
+  },
+
+  authorName:{
+    type: String
+  },
+  authorPhoto:{
+    url:String,
+    publicId:String
   }
+
 });
 
 // Update the updatedAt field before saving
-postSchema.pre("save", function(next) {
+postSchema.pre("save", function() {
   this.updatedAt = Date.now();
-  next();
+ 
 });
 
 // Index for faster queries
