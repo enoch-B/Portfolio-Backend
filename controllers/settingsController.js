@@ -2,6 +2,7 @@ import Settings from "../models/settings.js";
 
 // Get settings
 export const getSettings = async (req, res) => {
+  console.log(req.user);
   try {
     const settings = await Settings.getSettings();
     
@@ -10,7 +11,7 @@ export const getSettings = async (req, res) => {
       settings
     });
   } catch (error) {
-    console.error("Error fetching settings:", error);
+    console.log("Error fetching settings:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch settings",
