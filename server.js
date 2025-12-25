@@ -11,6 +11,7 @@ import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
+import mediaRoutes from "./routes/mediaUploadRoute.js"
 
 
 
@@ -22,9 +23,9 @@ if(!PORT){
 const app = express();
 
 
-app.use(express.json());
+app.use(express.json({limite: '10mb'}));
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 
 app.use(
@@ -45,6 +46,7 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/media", mediaRoutes)
 app.use("/api/settings", settingsRoutes);
 app.use("/api/comments", commentRoutes);
 
