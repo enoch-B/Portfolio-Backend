@@ -29,3 +29,4 @@ const createStorage = (folder) => {
   };
 
   export const profilePictureStorage = createStorage('profile-pictures');
+  export const blogPostStorage = createStorage('blog-posts');
