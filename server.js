@@ -16,22 +16,21 @@ import mediaRoutes from "./routes/mediaUploadRoute.js"
 
 
 const PORT = process.env.PORT || 5001;
-if(!PORT){
+if (!PORT) {
   console.error("PORT is not set");
 
 }
 const app = express();
 
 
-app.use(express.json({limite: '10mb'}));
+app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://henok-birhanu.vercel.app","http://localhost:5001","http://localhost:8080"],
-    credentials: true,
+    origin: ["http://localhost:3000", "https://henok-birhanu.vercel.app", "http://localhost:5001", "http://localhost:8080"],
   })
 );
 
