@@ -5,7 +5,8 @@ import {
   getPostBySlug,
   createPost,
   updatePost,
-  deletePost
+  deletePost,
+  getDashboardStats
 } from "../controllers/postController.js";
 import { authenticate, requireAdmin } from "../middleware/auth.js";
 
@@ -16,6 +17,7 @@ router.get("/", getAllPosts);
 router.get("/slug/:slug", getPostBySlug);
 
 // Protected routes (require authentication)
+router.get("/stats", authenticate, requireAdmin, getDashboardStats);
 router.get("/:id", authenticate, getPostById);
 router.post("/", authenticate, requireAdmin, createPost);
 router.put("/:id", authenticate, requireAdmin, updatePost);
