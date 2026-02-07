@@ -1,5 +1,5 @@
 import Media from "../models/media.js"; // Capitalized model name
-import {v2 as cloudinary} from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -12,10 +12,10 @@ cloudinary.config({
 // UPLOAD MEDIA
 export const uploadBlogPostMedia = async (req, res) => {
     try {
-        console.log("rEQUEST FROM FRONT END", req)
+        console.log("REQUEST FROM FRONT END", req.file)
         const userId = req.user.id;
 
-        if(!req.file){
+        if (!req.file) {
             return res.status(400).json({
                 success: false,
                 message: "No image uploaded"
@@ -38,7 +38,7 @@ export const uploadBlogPostMedia = async (req, res) => {
             message: "Image uploaded successfully",
             media: savedMedia
         });
-        
+
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -52,18 +52,21 @@ export const uploadBlogPostMedia = async (req, res) => {
 export const getAllBlogPostMedia = async (req, res) => {
     try {
         const userId = req.user.id;
+        console.log("Fetching media for userId:", userId);
         const mediaItems = await Media.find({ userId }).sort({ uploadedAt: -1 });
-        
+        console.log(`Found ${mediaItems.length} media items`);
+
         res.status(200).json({
             success: true,
-            media: mediaItems,
+            media: mediaItems || [],
             count: mediaItems.length
         });
     } catch (error) {
         console.log(error);
         res.status(500).json({
             success: false,
-            message: "Internal server error"
+            message: "Internal server error",
+            error: error.message
         });
     }
 };
@@ -73,14 +76,14 @@ export const getBlogPostMediaById = async (req, res) => {
     try {
         const { id } = req.params;
         const mediaItem = await Media.findById(id);
-        
-        if(!mediaItem){
+
+        if (!mediaItem) {
             return res.status(404).json({
                 success: false,
                 message: "Media not found"
             });
         }
-        
+
         res.status(200).json({
             success: true,
             media: mediaItem
@@ -98,21 +101,22 @@ export const getBlogPostMediaById = async (req, res) => {
 export const deleteBlogPostMedia = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log("Deleting media with ID:", id);
         const mediaItem = await Media.findById(id);
-        
-        if(!mediaItem){
+
+        if (!mediaItem) {
             return res.status(404).json({
                 success: false,
                 message: "Media not found"
             });
         }
-        
-        
+
+
         await cloudinary.uploader.destroy(mediaItem.publicId);
-        
-       
+
+
         await Media.deleteOne({ _id: id });
-        
+
         res.status(200).json({
             success: true,
             message: "Media deleted successfully"
