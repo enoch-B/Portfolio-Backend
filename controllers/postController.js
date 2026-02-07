@@ -1,20 +1,21 @@
 import Post from "../models/post.js";
+import User from "../models/user.js";
 
 // Get all posts (with filters)
 export const getAllPosts = async (req, res) => {
   try {
     const { status, tag, search, page = 1, limit = 10 } = req.query;
-    
+
     const query = {};
-    
+
     if (status && status !== "all") {
       query.status = status;
     }
-    
+
     if (tag && tag !== "all") {
       query.tags = { $in: [new RegExp(tag, "i")] };
     }
-    
+
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: "i" } },
@@ -24,14 +25,14 @@ export const getAllPosts = async (req, res) => {
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    
+
     const posts = await Post.find(query)
       .populate("author", "name email")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .select("-content"); // Exclude content for list view
-    
+
     const total = await Post.countDocuments(query);
 
     res.status(200).json({
@@ -56,9 +57,9 @@ export const getAllPosts = async (req, res) => {
 export const getPostById = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const post = await Post.findById(id).populate("author", "name email");
-    
+
     if (!post) {
       return res.status(404).json({
         success: false,
@@ -84,9 +85,9 @@ export const getPostById = async (req, res) => {
 export const getPostBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
-    
+
     const post = await Post.findOne({ slug }).populate("author", "name email profilePicture");
-    
+
     if (!post) {
       return res.status(404).json({
         success: false,
@@ -116,11 +117,11 @@ export const getPostBySlug = async (req, res) => {
 export const createPost = async (req, res) => {
   try {
 
-    console.log("Received post",req.user.profilePicture)
+    console.log("Received post", req.user.profilePicture)
     const { title, slug, excerpt, content, coverImage, tags, status } = req.body;
     const authorId = req.user.id;
-    const authorName= req.user.name;
-  
+    const authorName = req.user.name;
+
 
     if (!title || !content) {
       return res.status(400).json({
@@ -143,7 +144,7 @@ export const createPost = async (req, res) => {
 
     // Get author info
     const author = await User.findById(authorId).select("name profilePicture");
-    
+
     const post = new Post({
       title,
       slug: postSlug,
@@ -186,7 +187,7 @@ export const updatePost = async (req, res) => {
     const { title, slug, excerpt, content, coverImage, tags, status } = req.body;
 
     const post = await Post.findById(id);
-    
+
     if (!post) {
       return res.status(404).json({
         success: false,
@@ -241,7 +242,7 @@ export const deletePost = async (req, res) => {
     const { id } = req.params;
 
     const post = await Post.findById(id);
-    
+
     if (!post) {
       return res.status(404).json({
         success: false,
@@ -273,3 +274,77 @@ export const deletePost = async (req, res) => {
   }
 };
 
+// Get dashboard stats
+export const getDashboardStats = async (req, res) => {
+  try {
+    const totalPosts = await Post.countDocuments();
+    const publishedPosts = await Post.countDocuments({ status: "published" });
+    const draftPosts = await Post.countDocuments({ status: "draft" });
+
+    const allPosts = await Post.find().select("views tags");
+    const totalViews = allPosts.reduce((acc, post) => acc + (post.views || 0), 0);
+
+    // Most used tag
+    const tagCounts = {};
+    allPosts.forEach(post => {
+      if (post.tags && Array.isArray(post.tags)) {
+        post.tags.forEach(tag => {
+          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+        });
+      }
+    });
+
+    let mostUsedTag = "N/A";
+    let maxCount = 0;
+    for (const tag in tagCounts) {
+      if (tagCounts[tag] > maxCount) {
+        maxCount = tagCounts[tag];
+        mostUsedTag = tag;
+      }
+    }
+
+    const topPosts = await Post.find()
+      .sort({ views: -1 })
+      .limit(5)
+      .select("title views");
+
+    const recentPosts = await Post.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select("title coverImage publishedAt status");
+
+    // Monthly views - Since we don't have historical view data, 
+    // we'll provide some sample data that relates to the total views
+    // In a real app, you'd have a separate Views/Analytics collection
+    const currentMonth = new Date().toLocaleString('default', { month: 'short' });
+    const monthlyViews = [
+      { month: "Jan", views: Math.floor(totalViews * 0.15) },
+      { month: "Feb", views: Math.floor(totalViews * 0.25) },
+      { month: "Mar", views: Math.floor(totalViews * 0.2) },
+      { month: "Apr", views: Math.floor(totalViews * 0.3) },
+      { month: "May", views: Math.floor(totalViews * 0.1) },
+      { month: currentMonth, views: Math.floor(totalViews * 0.4) }
+    ];
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        totalPosts,
+        publishedPosts,
+        draftPosts,
+        totalViews,
+        mostUsedTag
+      },
+      topPosts,
+      recentPosts,
+      monthlyViews
+    });
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch dashboard stats",
+      error: error.message
+    });
+  }
+};
