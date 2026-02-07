@@ -1,24 +1,26 @@
 import mongoose from "mongoose";
 
 const mediaSchema = new mongoose.Schema({
-    media:{
-        url:String,
-        publicId:String
+    url: {
+        type: String,
+        required: true
     },
-    createdAt:{
-        type:Date,
-        default:Date.now
+    publicId: {
+        type: String,
+        required: true
     },
-    updatedAt:{
-        type:Date,
-        default:Date.now
+    name: String,
+    size: Number,
+    uploadedAt: {
+        type: Date,
+        default: Date.now
     },
-    userId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        required:true
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
     }
-});
+}, { timestamps: true });
 
 const Media = mongoose.model("Media", mediaSchema);
 
