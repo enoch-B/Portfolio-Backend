@@ -6,7 +6,8 @@ const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = [
     "image/jpeg",
     "image/png",
-    "image/webp"
+    "image/webp",
+    "image/gif"
   ];
 
   if (allowedMimeTypes.includes(file.mimetype)) {
@@ -39,6 +40,6 @@ export const uploadConfigs = {
 
 export const uploadProfilePicture =
   uploadConfigs.profilePictureUpload.single("profilePicture");
-export const uploadBlogPost = uploadConfigs.blogPostUpload.single("blogPost");
+export const uploadBlogPost = uploadConfigs.blogPostUpload.single("image");
 
 export default uploadConfigs;
