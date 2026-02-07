@@ -5,9 +5,9 @@ import { authenticate } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/blog-post/media", authenticate, uploadBlogPost, uploadBlogPostMedia);
-router.get("/blog-post/media/:id", authenticate, getBlogPostMediaById);
-router.get("/blog-post/media",authenticate, getAllBlogPostMedia)
-router.delete("/blog-post/media/:id", authenticate, deleteBlogPostMedia);
+router.post("/blog-post-media", authenticate, uploadBlogPost, uploadBlogPostMedia);
+router.get("/blog-post-media/:id", authenticate, getBlogPostMediaById);
+router.get("/blog-post-media",authenticate, getAllBlogPostMedia)
+router.delete("/blog-post-media/:id", authenticate, deleteBlogPostMedia);
 
 export default router;
